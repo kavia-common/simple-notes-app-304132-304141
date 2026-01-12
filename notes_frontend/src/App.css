@@ -1,104 +1,352 @@
-/* CSS Variables for Theme Management */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #64748b;
+  --border: #e5e7eb;
+
+  --primary: #3b82f6;
+  --success: #06b6d4;
+  --danger: #ef4444;
+
+  --shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 4px 12px rgba(17, 24, 39, 0.06);
+  --radius: 12px;
+  --radius-sm: 10px;
 }
 
-[data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+* {
+  box-sizing: border-box;
 }
 
-.App {
-  text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+.notes-app {
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Toolbar */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
+.app-brand__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--primary), var(--success));
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.app-brand__text {
+  font-size: 16px;
+}
+
+.toolbar__right {
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.06s ease, box-shadow 0.2s ease, opacity 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 1px 1px rgba(17, 24, 39, 0.06);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
+}
+
+.btn--danger {
+  background: #fff;
+  border-color: rgba(239, 68, 68, 0.35);
+  color: var(--danger);
+}
+
+.btn--danger:hover {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.12);
+}
+
+/* Layout */
+.layout {
+  height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar__header {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar__searchLabel {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.sidebar__search {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+
+.sidebar__search:focus {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.sidebar__content {
+  overflow: auto;
+  padding: 10px;
+}
+
+.sidebar__empty {
+  padding: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Note list items */
+.note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.note-list__item {
+  margin: 0;
+}
+
+.note-row {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.06s ease;
+}
+
+.note-row:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+}
+
+.note-row:active {
+  transform: translateY(1px);
+}
+
+.note-row--selected {
+  border-color: rgba(59, 130, 246, 0.7);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.note-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.note-row__title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-row__time {
+  font-size: 12px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.note-row__preview {
+  font-size: 13px;
+  color: rgba(17, 24, 39, 0.72);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Main/editor */
+.main {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 14px;
+}
+
+.editor--empty {
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
+  text-align: center;
+  color: var(--muted);
 }
 
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+.editor__emptyTitle {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 18px;
 }
 
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+.editor__emptyText {
+  margin: 0;
+  max-width: 420px;
   font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  line-height: 1.5;
 }
 
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+.editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.theme-toggle:active {
-  transform: translateY(0);
+.editor__field--grow {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.editor__label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.editor__input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.editor__input:focus {
+  border-color: rgba(6, 182, 212, 0.75);
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.14);
+}
+
+.editor__textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  min-height: 240px;
+  font-family: inherit;
+}
+
+.editor__textarea:focus {
+  border-color: rgba(59, 130, 246, 0.65);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 64px);
   }
-  to {
-    transform: rotate(360deg);
+  .sidebar {
+    height: 42vh;
+  }
+  .main {
+    height: calc(58vh - 16px);
   }
 }
 
-/* Responsive design for mobile */
-@media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
+@media (max-width: 480px) {
+  .toolbar {
+    padding: 0 12px;
+  }
+  .btn {
+    padding: 10px 10px;
+  }
+  .layout {
+    padding: 12px;
+    gap: 12px;
   }
 }
