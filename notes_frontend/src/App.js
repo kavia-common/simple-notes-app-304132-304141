@@ -5,8 +5,13 @@ import Editor from "./components/Editor";
 import Toolbar from "./components/Toolbar";
 import { createBlankNote, loadNotes, saveNotes } from "./utils/storage";
 
-function sortNotesDescendingByUpdatedAt(notes) {
+function sortNotesPinnedThenByUpdatedAt(notes) {
+  // Pinned group first; within each group sort by updatedAt descending.
   return [...notes].sort((a, b) => {
+    const ap = Boolean(a.pinned);
+    const bp = Boolean(b.pinned);
+    if (ap !== bp) return ap ? -1 : 1;
+
     const at = new Date(a.updatedAt).getTime();
     const bt = new Date(b.updatedAt).getTime();
     return bt - at;
@@ -25,8 +30,15 @@ function matchesQuery(note, q) {
 // PUBLIC_INTERFACE
 function App() {
   /** Notes app entrypoint: manages app-level state and persistence. */
-  const [notes, setNotes] = useState(() => sortNotesDescendingByUpdatedAt(loadNotes()));
-  const [selectedId, setSelectedId] = useState(() => (loadNotes()[0]?.id ? loadNotes()[0].id : null));
+  const initialNotes = useMemo(
+    () => sortNotesPinnedThenByUpdatedAt(loadNotes()),
+    []
+  );
+
+  const [notes, setNotes] = useState(() => initialNotes);
+  const [selectedId, setSelectedId] = useState(() =>
+    initialNotes[0]?.id ? initialNotes[0].id : null
+  );
   const [query, setQuery] = useState("");
   const focusEditorNext = useRef(false);
 
@@ -48,6 +60,8 @@ function App() {
   }, [notes]);
 
   const filteredNotes = useMemo(() => {
+    // Search applies within both pinned/unpinned groups while keeping pinned group on top.
+    // We filter the already-grouped `notes` array to preserve pinned-first ordering.
     return notes.filter((n) => matchesQuery(n, query));
   }, [notes, query]);
 
@@ -65,9 +79,11 @@ function App() {
   // PUBLIC_INTERFACE
   const handleNewNote = () => {
     const newNote = createBlankNote();
+    // Ensure explicit defaults.
     newNote.updatedAt = new Date().toISOString();
+    newNote.pinned = false;
 
-    setNotes((prev) => sortNotesDescendingByUpdatedAt([newNote, ...prev]));
+    setNotes((prev) => sortNotesPinnedThenByUpdatedAt([newNote, ...prev]));
     setSelectedId(newNote.id);
 
     // Focus editor after selection is applied.
@@ -80,16 +96,31 @@ function App() {
   };
 
   // PUBLIC_INTERFACE
+  const handleTogglePin = (id) => {
+    setNotes((prev) => {
+      const next = prev.map((n) =>
+        n.id === id ? { ...n, pinned: !Boolean(n.pinned) } : n
+      );
+      return sortNotesPinnedThenByUpdatedAt(next);
+    });
+  };
+
+  // PUBLIC_INTERFACE
   const handleNoteChange = (nextNote) => {
     // Update note and bump updatedAt on each change (autosave-friendly).
+    // Preserve `pinned` if it isn't part of the editor payload.
     const updated = {
       ...nextNote,
+      pinned:
+        typeof nextNote.pinned === "boolean"
+          ? nextNote.pinned
+          : Boolean(selectedNote?.pinned),
       updatedAt: new Date().toISOString(),
     };
 
     setNotes((prev) => {
       const next = prev.map((n) => (n.id === updated.id ? updated : n));
-      return sortNotesDescendingByUpdatedAt(next);
+      return sortNotesPinnedThenByUpdatedAt(next);
     });
   };
 
@@ -109,6 +140,9 @@ function App() {
         onNewNote={handleNewNote}
         onDeleteNote={handleDeleteSelected}
         canDelete={Boolean(selectedNote)}
+        canPin={Boolean(selectedNote)}
+        isPinned={Boolean(selectedNote?.pinned)}
+        onTogglePin={() => selectedNote && handleTogglePin(selectedNote.id)}
       />
 
       <div className="layout" aria-label="Notes app layout">
@@ -118,6 +152,7 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onSelect={handleSelect}
+          onTogglePin={handleTogglePin}
         />
 
         <main className="main" aria-label="Editor panel">

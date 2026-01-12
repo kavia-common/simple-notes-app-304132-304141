@@ -8,6 +8,7 @@ export default function Sidebar({
   query,
   onQueryChange,
   onSelect,
+  onTogglePin,
 }) {
   /** Sidebar that renders search input and list of notes. */
   return (
@@ -39,6 +40,7 @@ export default function Sidebar({
                 note={n}
                 isSelected={n.id === selectedId}
                 onSelect={() => onSelect(n.id)}
+                onTogglePin={() => onTogglePin?.(n.id)}
               />
             ))}
           </ul>

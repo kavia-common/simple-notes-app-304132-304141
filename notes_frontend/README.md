@@ -11,6 +11,9 @@ A lightweight, fully client-side Notes app built with React (no backend required
   - Creates a blank note and focuses the title field
 - Edit note (title + content)
   - Autosaves on change (updates `updatedAt`)
+- Pin / Unpin note
+  - Pinned notes appear at the top of the list
+  - Pin toggle is available both in the sidebar list row and in the top toolbar
 - Delete note
   - Confirmation dialog before deleting
 - Local persistence using `localStorage`
@@ -30,10 +33,13 @@ Value is a JSON array of objects:
     "id": "string",
     "title": "string",
     "content": "string",
-    "updatedAt": "ISO-8601 string"
+    "updatedAt": "ISO-8601 string",
+    "pinned": false
   }
 ]
 ```
+
+Notes created before the pin feature was added may not have a `pinned` field; these are treated as `false` on load.
 
 ## Development
 

@@ -6,6 +6,7 @@ const STORAGE_KEY = "simple_notes_app__notes_v1";
  * @property {string} title
  * @property {string} content
  * @property {string} updatedAt ISO string
+ * @property {boolean} pinned
  */
 
 // PUBLIC_INTERFACE
@@ -24,6 +25,8 @@ export function loadNotes() {
         content: typeof n.content === "string" ? n.content : "",
         updatedAt:
           typeof n.updatedAt === "string" ? n.updatedAt : new Date().toISOString(),
+        // Migration behavior: older notes won't have `pinned`; treat as false.
+        pinned: typeof n.pinned === "boolean" ? n.pinned : false,
       }))
       .filter((n) => n.id.length > 0);
   } catch {
@@ -59,5 +62,6 @@ export function createBlankNote() {
     title: "",
     content: "",
     updatedAt: now,
+    pinned: false,
   };
 }
